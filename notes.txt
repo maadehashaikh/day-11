@@ -1,0 +1,75 @@
+user ko profile dayny say pehly yeh checkkarna hota h aky user hay kon called as authentication 
+a person who is not authorized some tasks which are only allowed to be executed by the admin 
+as server bhool jata h kay ap ho kon so that har bar woh har kam kay liyay aapse poochy ga ap kon ho 
+every time we ask any tak or action to done by the app it asks the server and server will ask who you are so here is the cookie and session work come 
+every web or app works like this 
+sab say pehly hmy kuch chezain seekhni hain alag alag :
+1_ cookie kaisy set karty hain 
+
+app.get('/',function(req,res){
+   res.cookie("name", "maadeha");
+   res.send("done");
+}) 
+writing this code and when I use the extension Edit this cookie and i found the same name in the result section maadeha which was set as cookie 
+jab bh hm aik bar cookie ko set kardyty hain to what happens is that kay cookie sath chipak kay zarror jati h kisi bh dosray route p as uper hmny / page p cookie bheji h lekin ab yeh /read p bh dikh rhi h which is the simplest mean kay cookie server ko har route saybtati h who I am 
+remember cookie ko set karny kay liyay use res and to read it use req
+
+2_ bcrypt kaise use karty hain for password encryption and decryption 
+
+const bcrypt = require('bcrypt'); // do 2 things encryption and decrytion its npm package 
+there are many things in the bcrypt package but the to know these are important : 
+first aik salt banaty hain 
+genSalt => salt aik random string hoti h 
+phr hm aik hash bnaty hain => hash hota h diyaya huyay password ko ant shant words mai convert krdo
+phr hash ko salt kay sath mila do 
+what is encrypt => encrypt ka matlb hota h kay kisi bh tareqay kay through ya algorithm kay through real words or string ko change kardyna ya kisi or roop mai lay jana 
+sha256 => its an algorithm 
+
+=> password mama7777
+=> hash $2b$10$wHw17vFdxq1wizDpNIZFM.x1LaTj9Y0J.3Vh4sR7diI1DNs9RAyIO
+
+
+3_ JWT kia hay and JWT mai data kaisy store karain and bahar nikalain 
+
+so basically JWT 3 chezo say mil kay banta h  
+red part is algorithm ka hissa , purple part is data which you wanna store and last and sky part is signature related hissa hmy just purple part say layna dayna h 
+there is some concepts to understand here and they are : 
+
+1_ two users come and ask for a video or any account to see now server asks who you are ? 
+2_ the first one login with name and email and second one login with name and email 
+3_ server checks that both users are registered so it finds true 
+4_ now server will send a cookie to both of it users at their browsers 
+(mostly cookie mai email hoti h bcz its unique)
+5_ now both users has a cookie or unique string 
+6_ next time both users want to like a video 
+7_ ab jab server p like karny ki request jay ge to hoga yeh kay user kay browser kay sath request mai woh string chipak kay jay ge which will recognize him or her 
+8_ ab server kay pass yeh string aa gai h matlb recieve ho gai h 
+9_ ab server is string ko dcrypt kary ga ab jo purple part h na woh email store kia hua h us say pta chalay ga kay user h kon and server will not ask again and again kay tm ho kon ? 
+
+this code did that :-
+let token = jwt.sign({email : "maadeha@gmail.com"} , "secret") ;
+ console.log(token);
+Token's result is below : 
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1hYWRlaGFAZ21haWwuY29tIiwiaWF0IjoxNzI0MDkzNTQ0fQ.H2e9Gytf8V9XUWiFtvKHKiAf0koCqeORFPYITowObmM
+yeh woh string h jo user ka browser session kay bech mai bhejta h ....
+
+This code :
+app.get('/read',function(req,res){ 
+  console.log(req.cookies);
+})
+
+Results This :
+{
+  name: 'fatima',
+  token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1hYWRlaGFAZ21haWwuY29tIiwiaWF0IjoxNzI0MDkzNzIzfQ.8-DEMihfwy-f0dUNpikNg4IsNkOYFXISrQ_LP2WUUvI'
+}
+
+This code : 
+
+app.get('/read',function(req,res){ 
+  let data = jwt.verify(req.cookies.token , "secret");
+  console.log(data);
+})
+
+Results this : 
+{ email: 'maadeha@gmail.com', iat: 1724093723 }
